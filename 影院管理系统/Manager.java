@@ -1,11 +1,11 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class Manager extends User{
-    static String managerfile = "经理V1.1.txt";
+    static String managerfile = "经理V1.2.txt";
     protected static List<Manager> managers = FileManager.readUsersFromFile(managerfile, Manager.class);
 
     public Manager(String username, String password, String userID, String phoneNumber, String email, UserRole role, String registerTime) {
@@ -18,7 +18,9 @@ public class Manager extends User{
         boolean foundUser = false;
         for(User user : User.users){
             if(user.getUserName().equals(targetName) && user.getRole().equals(targetRole)){
-                user.setPassword("123456");
+                String resetedPassword = "123456";
+                String hashedPassword = User.hashPassword(resetedPassword);
+                user.setPassword(hashedPassword);
                 foundUser = true;
                 System.out.println("密码已重置为 123456 ");
                 break;
@@ -138,42 +140,42 @@ public class Manager extends User{
         FileManager.writeMoviesToFile(Movie.moviefile, Movie.movieList);
     }
 
-   // 删除影片信息
-   protected void deleteMovieMes(){
-    System.out.println("请输入要删除的影片名：");
-    String targetMovieName = sc.nextLine();
-
-    Iterator<Movie> iterator = Movie.movieList.iterator();
-    boolean found = false; // 用于标记是否找到匹配的影片
-
-    while(iterator.hasNext()){
-        Movie movie = iterator.next();
-
-        if(movie.getMovieName().equals(targetMovieName)){
-            found = true;
-            System.out.println("找到影片：" + movie.getMovieName());
-            System.out.println("删除后无法恢复，请确认是否删除（y/n）：");
-            String resure = sc.nextLine();
-
-            if(resure.equals("y")){
-                iterator.remove();
-                System.out.println("删除成功！");
-            }else if(resure.equals("n")){
-                System.out.println("取消删除操作。");
-            }else{
-                System.out.println("操作错误，请选择y/n");
+    // 删除影片信息
+    protected void deleteMovieMes(){
+        System.out.println("请输入要删除的影片名：");
+        String targetMovieName = sc.nextLine();
+    
+        Iterator<Movie> iterator = Movie.movieList.iterator();
+        boolean found = false; // 用于标记是否找到匹配的影片
+    
+        while(iterator.hasNext()){
+            Movie movie = iterator.next();
+    
+            if(movie.getMovieName().equals(targetMovieName)){
+                found = true;
+                System.out.println("找到影片：" + movie.getMovieName());
+                System.out.println("删除后无法恢复，请确认是否删除（y/n）：");
+                String resure = sc.nextLine();
+    
+                if(resure.equals("y")){
+                    iterator.remove();
+                    System.out.println("删除成功！");
+                }else if(resure.equals("n")){
+                    System.out.println("取消删除操作。");
+                }else{
+                    System.out.println("操作错误，请选择y/n");
+                }
+    
+                break; // 找到匹配的影片后，跳出循环
             }
-
-            break; // 找到匹配的影片后，跳出循环
         }
-    }
-
-    if (!found) {
-        System.out.println("未找到该影片，请重新输入");
-    }
-
-    FileManager.writeMoviesToFile(Movie.moviefile, Movie.movieList);
-} 
+    
+        if (!found) {
+            System.out.println("未找到该影片，请重新输入");
+        }
+    
+        FileManager.writeMoviesToFile(Movie.moviefile, Movie.movieList);
+    }    
 
     // 查询影片信息
     protected void searchMovies() {
@@ -382,27 +384,33 @@ public class Manager extends User{
     }
 
     // 删除电影场次
-    protected void deleteMovieSchedule(List<Schedule> schedules) {
-        listAllSchedules(schedules);
-        System.out.println("请选择要删除的场次：");
-        int deleteChoice = sc.nextInt();
-        sc.nextLine();
-    
-        Iterator<Schedule> iterator = schedules.iterator();
-        int currentIndex = 1;
-    
-        while (iterator.hasNext()) {
-            if (currentIndex == deleteChoice) {
+protected void deleteMovieSchedule(List<Schedule> schedules) {
+    listAllSchedules(schedules);
+    System.out.println("请选择要删除的场次：");
+    int deleteChoice = sc.nextInt();
+    sc.nextLine();
+
+    Iterator<Schedule> iterator = schedules.iterator();
+    int currentIndex = 1;
+
+    while (iterator.hasNext()) {
+        iterator.next();
+        if (currentIndex == deleteChoice) {
+            System.out.println("确认删除？(y/n)：");
+            String confirm = sc.nextLine();
+            if (confirm.equals("y")) {
                 iterator.remove(); // 使用迭代器删除当前元素
-                System.out.println("删除完成！");
-                return; // 删除后退出循环
+                System.out.println("删除成功！");
+            } else {
+                System.out.println("取消删除。");
             }
-            currentIndex++;
+            break; // 删除后退出循环
         }
-    
-        System.out.println("选择无效，请重新选择！");
-        FileManager.writeSchedulesToFile(Schedule.schedfile, schedules);
+        currentIndex++;
     }
+
+    FileManager.writeSchedulesToFile(Schedule.schedfile, schedules);
+}
 
     // 列出电影场次
     protected void listAllSchedules(List<Schedule> schedules) {

@@ -1,7 +1,11 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -15,7 +19,7 @@ public class User {
 	public UserRole role;
 	protected String registerTime;
 	protected User currentUser = null;
-	static String userfile = "所有用户V1.1.txt";
+	static String userfile = "所有用户V1.2.txt";
     protected static List<User> users = FileManager.readUsersFromFile(userfile, User.class);
 	Scanner sc = new Scanner(System.in);
 	
@@ -106,6 +110,8 @@ public class User {
         System.out.println("请输入密码:");
         String inputPassword = sc.nextLine();
 
+		String hashedPassword = User.hashPassword(inputPassword);
+
         // 查找用户
         User loginUser = null;
         for (User user : User.users) {
@@ -120,7 +126,7 @@ public class User {
 
         // 登录成功与失败
         if (loginUser != null) {
-            if (loginUser.getPassword().equals(inputPassword)) {
+            if (loginUser.getPassword().equals(hashedPassword)) {
                 System.out.println("登陆成功！");
                 // 设置当前登录用户
                 currentUser = loginUser;
@@ -156,10 +162,10 @@ public class User {
 		String newPasswordConfirm = sc.nextLine();
 	
 		if (newPassword.equals(newPasswordConfirm)) {
-
 			for(User user : User.users){
 				if(user.getUserName().equals(name)){
-					user.setPassword(newPassword);
+					String hashedPassword = User.hashPassword(newPasswordConfirm);
+					user.setPassword(hashedPassword);
 					System.out.println("密码修改成功！");
 					break;
 				}else{
@@ -187,6 +193,7 @@ public class User {
 		// 提示用户确认密码
 		System.out.println("请再次输入密码以确认：");
 		String aPassword = sc.nextLine();
+		String hasedPassword = User.hashPassword(aPassword);
 		if(!newPassword.equals(aPassword)){
 			System.out.println("两次输入密码输入不一致：");
 			return false;
@@ -201,7 +208,7 @@ public class User {
 		String newEmail = sc.nextLine();
 		
 		// 创建对象
-		User newUser = new User(newUsername,newPassword,generateID(10),newPhoneNumber,newEmail,null,registerTime);
+		User newUser = new User(newUsername,hasedPassword,generateID(10),newPhoneNumber,newEmail,null,registerTime);
 		User.users.add(newUser);
 		System.out.println("注册成功！");
 
@@ -241,4 +248,22 @@ public class User {
 
 		return false;
 	}
+
+	// 使用MD5哈希密码的方法
+    public static String hashPassword(String password){
+        try{
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+            byte[] hashBytes = md.digest(passwordBytes);
+            // 将哈希结果转换为十六进制字符串
+            Formatter formatter = new Formatter();
+            for (byte b : hashBytes) {
+                formatter.format("%02x", b);
+            }
+            return formatter.toString();
+        }catch(NoSuchAlgorithmException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

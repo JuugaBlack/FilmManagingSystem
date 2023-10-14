@@ -1,4 +1,4 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import FilmHubTutorialV11.User.UserRole;
+import FilmHubTutorialV12.User.UserRole;
 
 public class FileManager {
     public static List<Admin> readAdminsFromFile(String filePath) {

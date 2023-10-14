@@ -1,4 +1,4 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public class Movie {
     private Hall hall;
     private String timeLength;
     private double price;
-    static String moviefile = "电影信息V1.1.txt";
+    static String moviefile = "电影信息V1.2.txt";
     protected static List<Movie> movieList = FileManager.readMoviesFromFile(moviefile);
 
     public Movie() {

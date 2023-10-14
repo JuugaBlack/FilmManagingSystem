@@ -1,4 +1,4 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ public class Customer extends User{
     private String userLevel; 
     private double accumulatedConsume;  
     private int accumulatedTimes; 
-    static String customerfile = "顾客V1.1.txt";
+    static String customerfile = "顾客V1.2.txt";
     protected static List<Customer> customers = FileManager.readCustomersFromFile(customerfile);
 
     public Customer(String username, String password, String userID, String phoneNumber, String email, UserRole role, String registerTime){
@@ -50,17 +50,23 @@ public class Customer extends User{
 		System.out.println("请输入电子邮箱 > ");
 		String newEmail = sc.nextLine();
 		
-		// 创建对象
-		Customer newCustomer = new Customer(newUsername,newPassword,generateID(10),newPhoneNumber,newEmail,UserRole.CUSTOMER, registerTime);
-        newCustomer.setUserLevel("铜牌用户");  
-        newCustomer.setAccumulatedConsume(0.0);  
-        newCustomer.setAccumulatedTimes(0); 
-        User.users = FileManager.readUsersFromFile(User.userfile, User.class);
-        User.users.add(newCustomer);
-        customers.add(newCustomer);
-		System.out.println("注册成功！");
-        FileManager.writeUsersToFile(User.userfile, User.users);
-        FileManager.writeCustomersToFile(Customer.customerfile, customers);
+		// 读取已存在的数据
+customers = FileManager.readCustomersFromFile(Customer.customerfile);
+
+// 创建对象
+String hashedPassword = User.hashPassword(newPassword);
+Customer newCustomer = new Customer(newUsername, hashedPassword, generateID(10), newPhoneNumber, newEmail, UserRole.CUSTOMER, registerTime);
+newCustomer.setUserLevel("铜牌用户");
+newCustomer.setAccumulatedConsume(0.0);
+newCustomer.setAccumulatedTimes(0);
+
+// 将新对象添加到列表
+customers.add(newCustomer);
+
+// 将新数据写入文件，包括已存在的数据
+FileManager.writeCustomersToFile(Customer.customerfile, customers);
+
+System.out.println("注册成功！");
 
 		return true;
 	}
@@ -127,9 +133,10 @@ public class Customer extends User{
             String userName = sc.nextLine();
             System.out.println("请输入登录密码：");
             String password = sc.nextLine();
+            String hashedPassword = User.hashPassword(password);
 
             Customer customer = findByName(userName);
-            if(customer != null && password.equals(customer.getPassword())){
+            if(customer != null && hashedPassword.equals(customer.getPassword())){
                 System.out.println("登录成功！");
                 return true;
             }else{
@@ -143,7 +150,7 @@ public class Customer extends User{
     }
 
     private Customer findByName(String name){
-        for(Customer customer : FileManager.readCustomersFromFile(customerfile)){
+        for(Customer customer : customers){
             if(customer.getUserName().equals(name)){
                 return customer;
             }
@@ -166,9 +173,10 @@ public class Customer extends User{
 		String newPasswordConfirm = sc.nextLine();
 	
 		if (newPassword.equals(newPasswordConfirm)) {
+            String hasedPassword = User.hashPassword(newPassword);
 			for(User user : User.users){
 				if(user.getUserName().equals(name)){
-					user.setPassword(newPassword);
+					user.setPassword(hasedPassword);
 				}else{
 					System.out.println("输入的用户名不存在，请重新确认！");
 				}

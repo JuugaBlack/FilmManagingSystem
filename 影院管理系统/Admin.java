@@ -1,4 +1,4 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,7 +52,9 @@ public class Admin extends User{
         boolean foundUser = false;
         for(User user : User.users){
             if(user.getUserName().equals(targetName) && user.getRole() == targetRole){
-                user.setPassword("123456");
+                String resetedPassword = "123456";
+                String hashedPassword = User.hashPassword(resetedPassword);
+                user.setPassword(hashedPassword);
                 foundUser = true;
                 System.out.println("密码已重置为 123456 ");
                 break;
@@ -199,6 +201,9 @@ public class Admin extends User{
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String registerTime = dateFormat.format(new Date());
         String password = "123456";
+
+        String hashedPassword = User.hashPassword(password);
+
         UserRole role;
         if(userType.equalsIgnoreCase("FRONT_DESK")){
             role = UserRole.FRONT_DESK;
@@ -207,13 +212,13 @@ public class Admin extends User{
         }
 
         if(userType.equalsIgnoreCase("FRONT_DESK")){
-            Front_Desk newCinemaStaff = new Front_Desk(newUsername, password, userID, newPhoneNumber, newEmail, role, registerTime);
+            Front_Desk newCinemaStaff = new Front_Desk(newUsername, hashedPassword, userID, newPhoneNumber, newEmail, role, registerTime);
             Front_Desk.front_Desks.add(newCinemaStaff);
             User.users.add(newCinemaStaff);
             FileManager.writeUsersToFile(Front_Desk.frontdeskfile, Front_Desk.front_Desks);
             FileManager.writeUsersToFile(User.userfile, User.users);
         }else{
-            Manager newCinemaStaff = new Manager(newUsername, password, userID, newPhoneNumber, newEmail, role, registerTime);
+            Manager newCinemaStaff = new Manager(newUsername, hashedPassword, userID, newPhoneNumber, newEmail, role, registerTime);
             Manager.managers.add(newCinemaStaff);
             User.users.add(newCinemaStaff);
             FileManager.writeUsersToFile(Manager.managerfile, Manager.managers);
@@ -279,7 +284,7 @@ public class Admin extends User{
             break;
         }
         FileManager.writeUsersToFile(User.userfile, User.users);
-        FileManager.copyFileContent(User.userfile, Manager.managerfile, UserRole.MANAGER.toString());
+        FileManager.copyFileContent(User.userfile, Customer.customerfile, UserRole.MANAGER.toString());
         FileManager.copyFileContent(User.userfile, Front_Desk.frontdeskfile, UserRole.FRONT_DESK.toString());
     }
 }

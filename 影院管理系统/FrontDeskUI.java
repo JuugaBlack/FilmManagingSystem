@@ -1,4 +1,4 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.util.Scanner;
 

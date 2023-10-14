@@ -1,12 +1,12 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.util.List;
 import java.util.Scanner;
 
-import FilmHubTutorialV11.User.UserRole;
+import FilmHubTutorialV12.User.UserRole;
 
 public class AdiminUI {
-    static String adminfilepath = "管理员V1.1.txt";
+    static String adminfilepath = "管理员V1.2.txt";
     protected static List<Admin> adminList = FileManager.readAdminsFromFile(adminfilepath);
     protected static Admin admin;
 

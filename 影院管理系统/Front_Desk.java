@@ -1,9 +1,9 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.util.List;
 
 public class Front_Desk extends User{
-    static String frontdeskfile = "前台V1.1.txt";
+    static String frontdeskfile = "前台V1.2.txt";
     protected static List<Front_Desk> front_Desks = FileManager.readUsersFromFile(frontdeskfile, Front_Desk.class);
     
     public Front_Desk(String username, String password, String userID, String phoneNumber, String email, UserRole role,String registerTime){

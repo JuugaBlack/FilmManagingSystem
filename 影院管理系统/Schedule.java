@@ -1,4 +1,4 @@
-package FilmHubTutorialV11;
+package FilmHubTutorialV12;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ public class Schedule {
     Hall hall;
     private String time;
     private double price;
-    static String schedfile = "场次信息V1.1.txt";
+    static String schedfile = "场次信息V1.2.txt";
     protected static List<Schedule> schedulesList = FileManager.readSchedulesFromFile(schedfile, Movie.movieList, Hall.halls);
 
     public Schedule(Movie movie, Hall hall, String time, double price) {
