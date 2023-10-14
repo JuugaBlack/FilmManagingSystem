@@ -1,10 +1,10 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Front_Desk extends User{
-    protected static List<Front_Desk> front_Desks = new ArrayList<>();
+    static String frontdeskfile = "前台V1.1.txt";
+    protected static List<Front_Desk> front_Desks = FileManager.readUsersFromFile(frontdeskfile, Front_Desk.class);
     
     public Front_Desk(String username, String password, String userID, String phoneNumber, String email, UserRole role,String registerTime){
         super(username,password,userID,phoneNumber,email,role,registerTime);
@@ -99,10 +99,11 @@ public class Front_Desk extends User{
         Customer targetCustomer = null;
         for (Customer customer : customers) {
             if (customer.getUserName().equals(identifier) || customer.getPhoneNumber().equals(identifier)) {
-                targetCustomer = customer;
+                targetCustomer = (Customer)customer;
                 break;
             }
         }
+        
         if (targetCustomer == null) {
             System.out.println("未找到用户！");
             return;

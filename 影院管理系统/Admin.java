@@ -1,4 +1,4 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,6 +33,7 @@ public class Admin extends User{
 		} else {
 			System.out.println("两次输入的新密码不一致，密码修改失败！");
 		}
+        FileManager.writeAdminsToFile(AdiminUI.adminfilepath, AdiminUI.adminList);
 	}
     
     public boolean login(String username, String password){
@@ -49,7 +50,7 @@ public class Admin extends User{
 
     protected void resetPassword(String targetName,UserRole targetRole){
         boolean foundUser = false;
-        for(User user : Test.users){
+        for(User user : User.users){
             if(user.getUserName().equals(targetName) && user.getRole() == targetRole){
                 user.setPassword("123456");
                 foundUser = true;
@@ -61,12 +62,14 @@ public class Admin extends User{
         if(foundUser == false){
             System.out.println("未找到用户！");
         }
+
+        FileManager.writeUsersToFile(User.userfile, User.users);
     }
 
     // 列出影城方用户信息
     protected void listCinemaStaff(){
         System.out.println("影城员工信息：");
-        for (User user : Test.users) {
+        for (User user : User.users) {
             if (user.getRole() == UserRole.MANAGER || user.getRole() == UserRole.FRONT_DESK) {
                 System.out.println("用户ID: " + user.getUserID());
                 System.out.println("用户名: " + user.getUserName());
@@ -83,27 +86,38 @@ public class Admin extends User{
     protected void deleteCinemaStaff() {
         System.out.println("请输入要删除的用户名：");
         String targetName = sc.nextLine();
+        boolean isDeleted = false;
     
-        if (targetName != null) {
-            Iterator<User> iterator = Test.users.iterator();
-            boolean isDeleted = false;
-            while (iterator.hasNext()) {
-                User user = iterator.next();
-                if (user.getUserName().equals(targetName) && (user.getRole().equals(UserRole.MANAGER) || user.getRole().equals(UserRole.FRONT_DESK))) {
-                    System.out.print("请再次确认是否删除（y/n）：");
-                    String selection = sc.nextLine();
-                    if (selection.equals("y")) {
-                        iterator.remove(); // 使用迭代器安全删除元素
-                        isDeleted = true;
-                        System.out.println("删除成功！");
-                        break;
-                    } else {
-                        return;
-                    }
+        Iterator<User> userIterator = User.users.iterator();
+            while (userIterator.hasNext()) {
+            User user = userIterator.next();
+            if (user.getUserName().equals(targetName)) {
+                System.out.println("删除后不可恢复，确认删除吗（y/n）：");
+                String resure = sc.nextLine();
+                if(resure.equals("y")){
+                    userIterator.remove(); // 从User.users集合中删除
+                    isDeleted = true;
+                    System.out.println("删除成功！");
+                    FileManager.writeUsersToFile(User.userfile, User.users);
                 }
-            }
-            if (!isDeleted) {
+                break;
+        }
+    }
+        if (!isDeleted) {
                 System.out.println("用户名或身份不正确，请重新确认！");
+            }
+
+        
+            if(User.users.size() == 0){
+                FileManager.clearFile(Manager.managerfile);
+                FileManager.clearFile(Front_Desk.frontdeskfile);
+                FileManager.clearFile(Customer.customerfile);
+            }
+        for(User user : User.users){
+            if(user.getRole().equals(UserRole.MANAGER)){
+                FileManager.copyFileContent(User.userfile, Manager.managerfile, UserRole.MANAGER.toString());
+            }else if(user.getRole().equals(UserRole.FRONT_DESK)){
+                FileManager.copyFileContent(User.userfile, Front_Desk.frontdeskfile, UserRole.FRONT_DESK.toString());
             }
         }
     }
@@ -131,7 +145,7 @@ public class Admin extends User{
     
     private void displayCinemaStaff(String target, String targetType) {
         boolean found = false;
-        for (User user : Test.users) {
+        for (User user : User.users) {
             if (user.getUserID().equals(target) || user.getUserName().equals(target)) {
                 System.out.println("查询结果：");
                 System.out.println("用户ID: " + user.getUserID());
@@ -192,8 +206,19 @@ public class Admin extends User{
             role = UserRole.MANAGER;
         }
 
-        User newCinemaStaff = new User(newUsername, password, userID, newPhoneNumber, newEmail, role, registerTime);
-        Test.users.add(newCinemaStaff);
+        if(userType.equalsIgnoreCase("FRONT_DESK")){
+            Front_Desk newCinemaStaff = new Front_Desk(newUsername, password, userID, newPhoneNumber, newEmail, role, registerTime);
+            Front_Desk.front_Desks.add(newCinemaStaff);
+            User.users.add(newCinemaStaff);
+            FileManager.writeUsersToFile(Front_Desk.frontdeskfile, Front_Desk.front_Desks);
+            FileManager.writeUsersToFile(User.userfile, User.users);
+        }else{
+            Manager newCinemaStaff = new Manager(newUsername, password, userID, newPhoneNumber, newEmail, role, registerTime);
+            Manager.managers.add(newCinemaStaff);
+            User.users.add(newCinemaStaff);
+            FileManager.writeUsersToFile(Manager.managerfile, Manager.managers);
+            FileManager.writeUsersToFile(User.userfile, User.users);
+        }
 
         System.out.println("影城方用户添加成功！初始密码为123456");
         } 
@@ -204,7 +229,7 @@ public class Admin extends User{
         String targetName = sc.nextLine();
         User target = null;
 
-        for(User user : Test.users){
+        for(User user : User.users){
             if(user.getUserName().equals(targetName) && (user.getRole() == UserRole.FRONT_DESK || user.getRole() == UserRole.MANAGER)){
                 target = user;
                 break;
@@ -253,6 +278,8 @@ public class Admin extends User{
             System.out.println("请重新选择！");
             break;
         }
+        FileManager.writeUsersToFile(User.userfile, User.users);
+        FileManager.copyFileContent(User.userfile, Manager.managerfile, UserRole.MANAGER.toString());
+        FileManager.copyFileContent(User.userfile, Front_Desk.frontdeskfile, UserRole.FRONT_DESK.toString());
     }
-    
 }

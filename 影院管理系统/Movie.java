@@ -1,6 +1,5 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Movie {
@@ -11,10 +10,18 @@ public class Movie {
     private Hall hall;
     private String timeLength;
     private double price;
-    protected static List<Movie> movieList;
+    static String moviefile = "电影信息V1.1.txt";
+    protected static List<Movie> movieList = FileManager.readMoviesFromFile(moviefile);
 
-    static {
-        movieList = new ArrayList<>();
+    public Movie() {
+    }
+
+    public Movie(String movieName, String movieDirector, String mainActor, String information, String timeLength){
+        this.movieName = movieName;
+        this.movieDirector = movieDirector;
+        this.mainActor = mainActor;
+        this.information = information;
+        this.timeLength = timeLength;
     }
 
     public void setMovieName(String movieName) {
@@ -60,7 +67,7 @@ public class Movie {
         this.price = price;
     }
 
-    public static void addMovie(Movie movie) {
+    public void addMovie(Movie movie) {
         movieList.add(movie);
     }
 

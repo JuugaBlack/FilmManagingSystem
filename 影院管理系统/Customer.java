@@ -1,16 +1,16 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Customer extends User{
     private String userLevel; 
     private double accumulatedConsume;  
     private int accumulatedTimes; 
-    protected static List<Customer> customers = new ArrayList<>();
+    static String customerfile = "顾客V1.1.txt";
+    protected static List<Customer> customers = FileManager.readCustomersFromFile(customerfile);
 
-    public Customer(String username, String password, String userID, String phoneNumber, String email, UserRole role,String registerTime){
+    public Customer(String username, String password, String userID, String phoneNumber, String email, UserRole role, String registerTime){
         super(username, password, userID, phoneNumber, email, role,registerTime);
     }
 
@@ -51,13 +51,16 @@ public class Customer extends User{
 		String newEmail = sc.nextLine();
 		
 		// 创建对象
-		Customer newCustomer = new Customer(newUsername,newPassword,generateID(10),newPhoneNumber,newEmail,null,registerTime);
+		Customer newCustomer = new Customer(newUsername,newPassword,generateID(10),newPhoneNumber,newEmail,UserRole.CUSTOMER, registerTime);
         newCustomer.setUserLevel("铜牌用户");  
         newCustomer.setAccumulatedConsume(0.0);  
-        newCustomer.setAccumulatedTimes(0);  
-        Test.users.add(newCustomer);
+        newCustomer.setAccumulatedTimes(0); 
+        User.users = FileManager.readUsersFromFile(User.userfile, User.class);
+        User.users.add(newCustomer);
         customers.add(newCustomer);
 		System.out.println("注册成功！");
+        FileManager.writeUsersToFile(User.userfile, User.users);
+        FileManager.writeCustomersToFile(Customer.customerfile, customers);
 
 		return true;
 	}
@@ -140,7 +143,7 @@ public class Customer extends User{
     }
 
     private Customer findByName(String name){
-        for(Customer customer : customers){
+        for(Customer customer : FileManager.readCustomersFromFile(customerfile)){
             if(customer.getUserName().equals(name)){
                 return customer;
             }
@@ -163,7 +166,7 @@ public class Customer extends User{
 		String newPasswordConfirm = sc.nextLine();
 	
 		if (newPassword.equals(newPasswordConfirm)) {
-			for(User user : Test.users){
+			for(User user : User.users){
 				if(user.getUserName().equals(name)){
 					user.setPassword(newPassword);
 				}else{
@@ -171,11 +174,15 @@ public class Customer extends User{
 				}
 			}
 			System.out.println("密码修改成功！");
-
-
 		} else {
 			System.out.println("两次输入的新密码不一致，密码修改失败！");
 		}
+        FileManager.writeUsersToFile(User.userfile, User.users);
+        for(User user : User.users){
+            if(user.getRole().equals(UserRole.CUSTOMER)){
+                FileManager.copyFileContent(User.userfile, Customer.customerfile, UserRole.CUSTOMER.toString());
+            }
+        }
     }
 
     // 忘记密码
@@ -185,11 +192,10 @@ public class Customer extends User{
         System.out.println("请输入用户邮箱地址：");
 		String email = sc.nextLine();
 
-        for(Customer customer : customers){
+        for(User customer : User.users){
             if(customer.getUserName().equals(name) && customer.getEmail().equals(email)){
-                String newPassword = generatePassword();
                 // 模拟发送重置密码邮件
-                boolean emailSent = sendPasswordResetEmail(newPassword);
+                boolean emailSent = false;
                 if(emailSent){
                     System.out.println("密码重置邮件已发送到邮箱，请登录查看新密码");
                 }else{
@@ -199,25 +205,12 @@ public class Customer extends User{
                 System.out.println("用户名或邮箱错误，请重新输入");
             }
         }
-    }
-
-    private String generatePassword(){
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        int length = 10;
-        Random random = new Random();
-        StringBuilder newPassword = new StringBuilder();
-        
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(characters.length());
-            newPassword.append(characters.charAt(index));
+        FileManager.writeUsersToFile(User.userfile, User.users);
+        for(User user : User.users){
+            if(user.getRole().equals(UserRole.CUSTOMER)){
+                FileManager.copyFileContent(User.userfile, Customer.customerfile, UserRole.CUSTOMER.toString());
+            }
         }
-
-        return newPassword.toString();
-    }
-
-    private boolean sendPasswordResetEmail(String newPassword){
-        // 发送新密码
-        return false;
     }
 
     // 查看电影信息
@@ -335,7 +328,9 @@ public class Customer extends User{
         String customerUsername = this.username;
         System.out.println("请选择电影：");
         listMovieMes(movies);
-        if(movies == null){
+
+        if (movies == null || movies.isEmpty()) {
+            System.out.println("没有可用的电影！");
             return;
         }
     
@@ -430,7 +425,7 @@ public class Customer extends User{
         } else if ("银牌用户".equals(getUserLevel())) {
             discount = 0.95; // 银牌用户享受 95 折
         }
-        double pay = selectedSchedule.getPrice() * discount * ticketsNum;
+        double pay = selectedSchedule.getPrice() * discount;
     
         // 模拟支付操作，如果支付成功
     if (simulatePayment(pay)) {

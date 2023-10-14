@@ -1,4 +1,4 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
 public class Seat {
 

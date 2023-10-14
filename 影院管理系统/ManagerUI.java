@@ -1,4 +1,4 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
 import java.util.Scanner;
 
@@ -74,10 +74,10 @@ public class ManagerUI {
                         manager.listAllSchedules(Schedule.schedulesList);
                         break;
                     case 12:
-                        manager.listCustomerMes(Customer.customers);
+                        manager.listCustomerMes();
                         break;
                     case 13:
-                        manager.searchCustomerMes(Customer.customers);
+                        manager.searchCustomerMes();
                         break;
                     case 14:
                         manager.logout();

@@ -1,10 +1,12 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class Manager extends User{
+    static String managerfile = "经理V1.1.txt";
+    protected static List<Manager> managers = FileManager.readUsersFromFile(managerfile, Manager.class);
 
     public Manager(String username, String password, String userID, String phoneNumber, String email, UserRole role, String registerTime) {
         super(username, password, userID, phoneNumber, email, role,registerTime);
@@ -14,7 +16,7 @@ public class Manager extends User{
         UserRole targetRole = UserRole.CONSUMER;
 
         boolean foundUser = false;
-        for(User user : Test.users){
+        for(User user : User.users){
             if(user.getUserName().equals(targetName) && user.getRole().equals(targetRole)){
                 user.setPassword("123456");
                 foundUser = true;
@@ -26,6 +28,7 @@ public class Manager extends User{
         if(foundUser == false){
             System.out.println("未找到用户！");
         }
+        FileManager.writeUsersToFile(User.userfile, User.users);
     }
 
     // 列出电影信息
@@ -67,8 +70,9 @@ public class Manager extends User{
         String newMovieTimeLength = sc.nextLine();
         newMovie.setTimeLength(newMovieTimeLength);
 
-        Movie.addMovie(newMovie);
+        Movie.movieList.add(newMovie);
         System.out.println("添加成功！");
+        FileManager.writeMoviesToFile(Movie.moviefile, Movie.movieList);
     }
 
     // 修改电影信息
@@ -131,34 +135,45 @@ public class Manager extends User{
                 break;
             }
         }
+        FileManager.writeMoviesToFile(Movie.moviefile, Movie.movieList);
     }
 
-    // 删除影片信息
-    protected void deleteMovieMes(){
-        System.out.println("请输入要删除的影片名：");
-        String targetMovieName = sc.nextLine();
+   // 删除影片信息
+   protected void deleteMovieMes(){
+    System.out.println("请输入要删除的影片名：");
+    String targetMovieName = sc.nextLine();
 
-        Iterator<Movie> iterator = Movie.movieList.iterator();
-        while(iterator.hasNext()){
-            Movie movie = iterator.next();
+    Iterator<Movie> iterator = Movie.movieList.iterator();
+    boolean found = false; // 用于标记是否找到匹配的影片
 
-            if(!movie.getMovieName().equals(targetMovieName)){
-                System.out.println("未找到该影片，请重新输入");
+    while(iterator.hasNext()){
+        Movie movie = iterator.next();
+
+        if(movie.getMovieName().equals(targetMovieName)){
+            found = true;
+            System.out.println("找到影片：" + movie.getMovieName());
+            System.out.println("删除后无法恢复，请确认是否删除（y/n）：");
+            String resure = sc.nextLine();
+
+            if(resure.equals("y")){
+                iterator.remove();
+                System.out.println("删除成功！");
+            }else if(resure.equals("n")){
+                System.out.println("取消删除操作。");
             }else{
-                System.out.println("删除后无法恢复，请再次确认是否删除（y/n）：");
-                String resure = sc.nextLine();
-                if(resure.equals("y")){
-                    iterator.remove();
-                    System.out.println("删除完成！");
-                    break;
-                }else if(resure.equals("n")){
-                    return;
-                }else{
-                    System.out.println("操作错误，请选择y/n");
-                }
+                System.out.println("操作错误，请选择y/n");
             }
+
+            break; // 找到匹配的影片后，跳出循环
         }
     }
+
+    if (!found) {
+        System.out.println("未找到该影片，请重新输入");
+    }
+
+    FileManager.writeMoviesToFile(Movie.moviefile, Movie.movieList);
+} 
 
     // 查询影片信息
     protected void searchMovies() {
@@ -278,6 +293,7 @@ public class Manager extends User{
         schedules.add(newSchedule);
     
         System.out.println("电影场次已成功添加！");
+        FileManager.writeSchedulesToFile(Schedule.schedfile, schedules);
     }
 
     // 修改电影场次
@@ -355,7 +371,7 @@ public class Manager extends User{
             default:
             System.out.println("选择无效，请重新选择！");
         }
-
+        FileManager.writeSchedulesToFile(Schedule.schedfile, schedules);
     }
 
     private void listMovieSchedule(List<Schedule> schedules) {
@@ -369,24 +385,25 @@ public class Manager extends User{
     protected void deleteMovieSchedule(List<Schedule> schedules) {
         listAllSchedules(schedules);
         System.out.println("请选择要删除的场次：");
-    
         int deleteChoice = sc.nextInt();
         sc.nextLine();
     
-        int currentIndex = 1;
         Iterator<Schedule> iterator = schedules.iterator();
+        int currentIndex = 1;
     
         while (iterator.hasNext()) {
-            Schedule schedule = iterator.next();
             if (currentIndex == deleteChoice) {
-                iterator.remove(); // 删除当前元素
+                iterator.remove(); // 使用迭代器删除当前元素
                 System.out.println("删除完成！");
                 return; // 删除后退出循环
             }
             currentIndex++;
         }
-    }
     
+        System.out.println("选择无效，请重新选择！");
+        FileManager.writeSchedulesToFile(Schedule.schedfile, schedules);
+    }
+
     // 列出电影场次
     protected void listAllSchedules(List<Schedule> schedules) {
         for (Schedule schedule : schedules) {
@@ -404,9 +421,9 @@ public class Manager extends User{
     }
 
     // 列出消费者信息
-    protected void listCustomerMes(List<Customer> customers){
-        for(Customer customer : customers){
-            if (customer.getRole() == UserRole.CONSUMER) {
+    protected void listCustomerMes(){
+        for(Customer customer : Customer.customers){
+            if (customer.getRole().equals(UserRole.CUSTOMER)) {
                 System.out.println("用户ID：" + customer.getUserID());
                 System.out.println("用户名：" + customer.getUserName());
                 System.out.println("用户级别：" + customer.getUserLevel());
@@ -421,7 +438,7 @@ public class Manager extends User{
     }
 
     // 查询用户信息
-    protected void searchCustomerMes(List<Customer> customers){
+    protected void searchCustomerMes(){
         System.out.println("请选择查询方式：");
         System.out.println("1. 根据用户ID查询");
         System.out.println("2. 根据用户名查询");
@@ -434,7 +451,7 @@ public class Manager extends User{
             case 1:
                 System.out.println("请输入用户ID：");
                 String targetUserID = sc.nextLine();
-                Customer foundByID = searchCustomerByID(customers, targetUserID);
+                Customer foundByID = searchCustomerByID(Customer.customers, targetUserID);
                 if (foundByID != null) {
                     displayCustomerInfo(foundByID);
                 } else {
@@ -445,7 +462,7 @@ public class Manager extends User{
             case 2:
                 System.out.println("请输入用户名：");
                 String targetUsername = sc.nextLine();
-                Customer foundByUsername = searchCustomerByUsername(customers, targetUsername);
+                Customer foundByUsername = searchCustomerByUsername(Customer.customers, targetUsername);
                 if (foundByUsername != null) {
                     displayCustomerInfo(foundByUsername);
                 } else {
@@ -454,7 +471,7 @@ public class Manager extends User{
                 break;
     
             case 3:
-                listCustomerMes(customers);
+                listCustomerMes();
                 break;
     
             default:

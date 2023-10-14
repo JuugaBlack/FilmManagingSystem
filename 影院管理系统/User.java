@@ -1,7 +1,8 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -14,6 +15,8 @@ public class User {
 	public UserRole role;
 	protected String registerTime;
 	protected User currentUser = null;
+	static String userfile = "所有用户V1.1.txt";
+    protected static List<User> users = FileManager.readUsersFromFile(userfile, User.class);
 	Scanner sc = new Scanner(System.in);
 	
 	public User(String username,String password,String userID,String phoneNumber,String email,UserRole role,String registerTime) {
@@ -105,7 +108,7 @@ public class User {
 
         // 查找用户
         User loginUser = null;
-        for (User user : Test.users) {
+        for (User user : User.users) {
             if (user.getUserName().equals(inputUsername)) {
                 loginUser = user;
                 break;
@@ -154,7 +157,7 @@ public class User {
 	
 		if (newPassword.equals(newPasswordConfirm)) {
 
-			for(User user : Test.users){
+			for(User user : User.users){
 				if(user.getUserName().equals(name)){
 					user.setPassword(newPassword);
 					System.out.println("密码修改成功！");
@@ -199,7 +202,7 @@ public class User {
 		
 		// 创建对象
 		User newUser = new User(newUsername,newPassword,generateID(10),newPhoneNumber,newEmail,null,registerTime);
-		Test.users.add(newUser);
+		User.users.add(newUser);
 		System.out.println("注册成功！");
 
 		
@@ -208,7 +211,7 @@ public class User {
 
 	// 检测用户名是否重复
 	public boolean isUserNameTaken(String username){
-		for(User user : Test.users){
+		for(User user : User.users){
 			if(user.getUserName().equals(username)){
 				return true;
 			}
@@ -219,7 +222,7 @@ public class User {
 
 	// 检测手机号是否重复
 	public boolean isPhoneNumberTaken(String phoneNumber){
-		for(User user : Test.users){
+		for(User user : User.users){
 			if(user.getPhoneNumber().equals(phoneNumber)){
 				return true;
 			}
@@ -230,7 +233,7 @@ public class User {
 
 	//检测邮箱是否重复
 	public boolean isEmailTaken(String email){
-		for(User user : Test.users){
+		for(User user : User.users){
 			if(user.getEmail().equals(email)){
 				return true;
 			}

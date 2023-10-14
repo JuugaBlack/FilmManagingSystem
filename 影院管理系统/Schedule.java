@@ -1,6 +1,5 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Schedule {
@@ -8,7 +7,8 @@ public class Schedule {
     Hall hall;
     private String time;
     private double price;
-    protected static List<Schedule> schedulesList = new ArrayList<>();
+    static String schedfile = "场次信息V1.1.txt";
+    protected static List<Schedule> schedulesList = FileManager.readSchedulesFromFile(schedfile, Movie.movieList, Hall.halls);
 
     public Schedule(Movie movie, Hall hall, String time, double price) {
         this.movie = movie;

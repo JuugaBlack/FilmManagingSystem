@@ -1,20 +1,24 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import FilmHubTutorialV10.User.UserRole;
+import FilmHubTutorialV11.User.UserRole;
 
 public class AdiminUI {
-    protected static List<Admin> adminList = new ArrayList<>();
+    static String adminfilepath = "管理员V1.1.txt";
+    protected static List<Admin> adminList = FileManager.readAdminsFromFile(adminfilepath);
     protected static Admin admin;
 
     // 静态初始化块在类加载时执行一次
     static {
+    if (adminList.isEmpty()) {
+        // 如果文件中没有管理员信息，可以添加默认管理员
         admin = new Admin("admin", "ynuinfo#777", "000000", "15911312058", "1609354709@qq.com", UserRole.ADMINISTRATOR, null);
         adminList.add(admin);
+        FileManager.writeAdminsToFile(adminfilepath, adminList);
     }
+}
     
     public static void adminUI(){
         Scanner sc = new Scanner(System.in);

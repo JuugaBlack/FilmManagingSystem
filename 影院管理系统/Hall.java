@@ -1,4 +1,4 @@
-package FilmHubTutorialV10;
+package FilmHubTutorialV11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,5 +69,10 @@ public class Hall {
 
     public static List<Hall> getHalls() {
         return halls;
+    }
+
+    // 自定义toString()方法
+    public String hallNumtoString() {
+        return String.valueOf(getHallNumber());
     }
 }
